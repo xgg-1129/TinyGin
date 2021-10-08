@@ -1,14 +1,15 @@
 package TinyGin
 
 import (
-	"log"
-	"net/http"
-
+	"fmt"
 	"testing"
 )
 
 func TestNewServer(t *testing.T) {
 	s:=NewServer()
-	log.Fatal(http.ListenAndServe(":9999",s))
+	s.AddGet("/Hello", func(ctx *HttpContext) {
+		ctx.SendString(200,fmt.Sprintf("Hello%s",ctx.Req.URL))
+	})
+	s.Run(":9999")
 }
 
