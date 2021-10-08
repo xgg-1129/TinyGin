@@ -1,1 +1,4 @@
-TinyGin
+1.Server通过实现ServeHttp方法，然后使用Http.ListenAndServer,接受所有Http请求
+2.将write和request封装成一个HttpContext
+3.使用前缀树实现动态路由，路由表注册的路由可以是动态的，一条动态路由可以匹配多条路径
+4.分组控制路由，可以直接通过Group添加路由

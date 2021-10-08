@@ -1,6 +1,7 @@
 package TinyGin
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -26,3 +27,19 @@ func TestNewRoute(t *testing.T) {
 	}
 }
 
+func TestGroup(t *testing.T) {
+	s:=NewServer()
+	v1 := s.Group("/v1")
+	{
+		v1.AddGet("/hello", func(ctx *HttpContext) {
+				ctx.SendString(200,fmt.Sprintf("you are at the %sGroup",v1.prefix))
+		})
+	}
+	v2:=s.Group("v2")
+	{
+		v2.AddGet("/hello", func(ctx *HttpContext) {
+			ctx.SendString(200,fmt.Sprintf("you are at the %sGroup",v2.prefix))
+		})
+	}
+	s.Run(":9999")
+}

@@ -7,11 +7,13 @@ import (
 
 type Server struct {
 	route *Route
+	Groups []*Group
 }
 
 func NewServer()*Server{
 	s:=&Server{}
 	s.route=NewRoute()
+	s.Groups=make([]*Group,0)
 	return s
 }
 func (s *Server) Run(addr string)  {
@@ -26,5 +28,13 @@ func (s *Server) AddGet(path string,fun HandleFun) error{
 }
 func (s *Server) AddPost(path string,fun HandleFun)error {
 	return s.route.AddPost(path,fun)
+}
+func (s *Server) Group(prefix string)*Group{
+	g:=&Group{
+		prefix:prefix,
+		Server: s,
+	}
+	s.Groups=append(s.Groups,g)
+	return g
 }
 
