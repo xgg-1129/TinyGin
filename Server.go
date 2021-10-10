@@ -1,6 +1,7 @@
 package TinyGin
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -42,5 +43,20 @@ func (s *Server) Group(prefix string)*Group{
 	}
 	s.Groups=append(s.Groups,g)
 	return g
+}
+
+func (s *Server) RegisterStatic(prefixpath string,filepath string)  {
+	handle:=s.createStaticHandler(prefixpath,http.Dir(filepath))
+	url:=prefixpath+"/*filename"
+	fmt.Println(url)
+	s.AddGet(url,handle)
+}
+
+func (s *Server) createStaticHandler(relativePath string, fs http.FileSystem) HandleFun{
+	fileserver:=http.StripPrefix(relativePath,http.FileServer(fs))
+	return func(ctx *HttpContext) {
+		fmt.Println(ctx.path)
+		fileserver.ServeHTTP(ctx.W,ctx.Req)
+	}
 }
 

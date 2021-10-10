@@ -3,7 +3,6 @@ package TinyGin
 import (
 	"fmt"
 	"log"
-	"net/http"
 	"testing"
 	"time"
 )
@@ -31,16 +30,7 @@ func onlyForV2()HandleFun {
 
 func Test(t *testing.T){
 	r := NewServer()
-
-	v2 := r.Group("/v2")
-	v2.RegisterMiddles(onlyForV2()) // v2 group middleware
-	{
-		v2.AddGet("/hello/:name", func(c *HttpContext) {
-			// expect /hello/geektutu
-			c.SendString(http.StatusOK, fmt.Sprintf("hello , you're at %s\n",  c.path))
-		})
-	}
-
+	r.RegisterStatic("/assets", "D:\\Environment\\ProjectGo\\src\\TinyGin")
 	r.Run(":9999")
 	return
 }
