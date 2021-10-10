@@ -2,29 +2,50 @@ package TinyGin
 
 import (
 	"fmt"
+	"log"
+	"net/http"
 	"testing"
+	"time"
 )
 
-func newTest() *Route{
-	r:=NewRoute()
-	r.addRoute("GET", "/", nil)
-	r.addRoute("GET", "/hello/:name", nil)
-	r.addRoute("GET", "/hello/b/c", nil)
-	r.addRoute("GET", "/hi/:name", nil)
-	r.addRoute("GET", "/assets/*filepath", nil)
-	return r
+func Logger() HandleFun {
+	return func(c *HttpContext) {
+		// Start timer
+		t := time.Now()
+		// Process request
+		c.doAllNext()
+		// Calculate resolution time
+		log.Printf("[%d] %s in %v", c.statusCode, c.Req.RequestURI, time.Since(t))
+	}
+}
+func onlyForV2()HandleFun {
+	return func(c *HttpContext) {
+		// Start timer
+		t := time.Now()
+		// if a server error occurred
+		c.SendString(500, "Internal Server Error")
+		// Calculate resolution time
+		log.Printf("[%d] %s in %v for group v2", c.statusCode, c.Req.RequestURI, time.Since(t))
+	}
+}
+
+func Test(t *testing.T){
+	r := NewServer()
+
+	v2 := r.Group("/v2")
+	v2.RegisterMiddles(onlyForV2()) // v2 group middleware
+	{
+		v2.AddGet("/hello/:name", func(c *HttpContext) {
+			// expect /hello/geektutu
+			c.SendString(http.StatusOK, fmt.Sprintf("hello , you're at %s\n",  c.path))
+		})
+	}
+
+	r.Run(":9999")
+	return
 }
 func TestNewRoute(t *testing.T) {
-	r:=newTest()
 
-	n := r.GetRoute("GET", "/hello/xgg")
-
-	if n == nil{
-		t.Fatal("nil shouldn't be returned")
-	}
-	if n.path != "/hello/:name"{
-		t.Fatal("match is fault")
-	}
 }
 
 func TestGroup(t *testing.T) {

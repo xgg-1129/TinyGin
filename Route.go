@@ -63,12 +63,15 @@ func (r *Route) AddGet(path string,fun HandleFun) error{
 func (r *Route) AddPost(path string,fun HandleFun) error{
 	return r.addRoute("POST",path,fun)
 }
-func (r Route) handle(ctx *HttpContext) {
+func (r *Route) handle(ctx *HttpContext) {
 	routeNode:=r.GetRoute(ctx.method,ctx.path)
 	if routeNode != nil{
 		key:=ctx.method+"-"+routeNode.path
-		r.HandleFunsMap[key](ctx)
+		f:=r.HandleFunsMap[key]
+		ctx.handles=append(ctx.handles,f)
+		ctx.doAllNext()
 	}else{
+		//没有注册的函数，直接发送404，不需要执行中间件
 		ctx.W.WriteHeader(404)
 		fmt.Fprintf(ctx.W,"404 not found")
 	}

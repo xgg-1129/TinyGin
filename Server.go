@@ -3,6 +3,7 @@ package TinyGin
 import (
 	"log"
 	"net/http"
+	"strings"
 )
 
 type Server struct {
@@ -21,6 +22,11 @@ func (s *Server) Run(addr string)  {
 }
 func (s *Server) ServeHTTP(w http.ResponseWriter, req *http.Request)  {
 	context := GenerateHttpContext(w, req)
+	for _,group := range s.Groups{
+		if strings.HasPrefix(context.path,group.prefix){
+			context.handles=append(context.handles,group.middles...)
+		}
+	}
 	s.route.handle(context)
 }
 func (s *Server) AddGet(path string,fun HandleFun) error{

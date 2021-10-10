@@ -13,6 +13,9 @@ type HttpContext struct {
 	method string
 	path string
 	statusCode int
+
+	handles []HandleFun
+	index int
 }
 
 func GenerateHttpContext(w http.ResponseWriter, req *http.Request) *HttpContext {
@@ -21,6 +24,8 @@ func GenerateHttpContext(w http.ResponseWriter, req *http.Request) *HttpContext 
 		Req:        req,
 		method:    req.Method,
 		path: req.URL.Path,
+		handles: make([]HandleFun,0),
+		index: -1,
 	}
 	fmt.Println(context.path)
 	return context
@@ -62,5 +67,13 @@ func (c *HttpContext) SendHtml(code int,Html string)  {
 	c.setHeader("Content-Type", "text/html")
 	c.sendHeader(code)
 	c.W.Write([]byte(Html))
+}
+
+func (c *HttpContext) doAllNext(){
+	c.index++
+	s := len(c.handles)
+	for ; c.index < s; c.index++ {
+		c.handles[c.index](c)
+	}
 }
 
