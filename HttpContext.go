@@ -16,6 +16,9 @@ type HttpContext struct {
 
 	handles []HandleFun
 	index int
+
+	//通过server使用templates
+	server *Server
 }
 
 func GenerateHttpContext(w http.ResponseWriter, req *http.Request) *HttpContext {
@@ -63,10 +66,17 @@ func (c *HttpContext) SendJson(code int,data H) {
 		c.W.Write([]byte("json Decoding error"))
 	}
 }
-func (c *HttpContext) SendHtml(code int,Html string)  {
+func (c *HttpContext) SendHtml(code int,templateName string,data interface{})  {
 	c.setHeader("Content-Type", "text/html")
 	c.sendHeader(code)
-	c.W.Write([]byte(Html))
+	template:=c.server.Templates[templateName]
+	if template==nil{
+		c.SendString(404,"no html template")
+	}else{
+		if err := c.server.Templates[templateName].Execute(c.W, data);err!=nil{
+			c.SendString(500,err.Error())
+		}
+	}
 }
 
 func (c *HttpContext) doAllNext(){

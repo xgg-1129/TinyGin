@@ -3,6 +3,7 @@ package TinyGin
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"testing"
 	"time"
 )
@@ -27,12 +28,23 @@ func onlyForV2()HandleFun {
 		log.Printf("[%d] %s in %v for group v2", c.statusCode, c.Req.RequestURI, time.Since(t))
 	}
 }
-
+type student struct {
+	Name string
+	Age  int8
+}
 func Test(t *testing.T){
 	r := NewServer()
-	r.RegisterStatic("/assets", "D:\\Environment\\ProjectGo\\src\\TinyGin")
+	r.AddHtmlTemplate("D:\\Environment\\ProjectGo\\src\\TinyGin\\Templates\\template1.html","tem1")
+	stu1 := &student{Name: "Geektutu", Age: 20}
+	stu2 := &student{Name: "Jack", Age: 22}
+
+	r.AddGet("/students", func(c *HttpContext) {
+		c.SendHtml(http.StatusOK, "tem1", H{
+			"title":  "gee",
+			"stuArr": [2]*student{stu1, stu2},
+		})
+	})
 	r.Run(":9999")
-	return
 }
 func TestNewRoute(t *testing.T) {
 

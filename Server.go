@@ -2,6 +2,7 @@ package TinyGin
 
 import (
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"strings"
@@ -10,12 +11,14 @@ import (
 type Server struct {
 	route *Route
 	Groups []*Group
+	Templates map[string]*template.Template
 }
 
 func NewServer()*Server{
 	s:=&Server{}
 	s.route=NewRoute()
 	s.Groups=make([]*Group,0)
+	s.Templates=make(map[string]*template.Template)
 	return s
 }
 func (s *Server) Run(addr string)  {
@@ -23,6 +26,7 @@ func (s *Server) Run(addr string)  {
 }
 func (s *Server) ServeHTTP(w http.ResponseWriter, req *http.Request)  {
 	context := GenerateHttpContext(w, req)
+	context.server=s
 	for _,group := range s.Groups{
 		if strings.HasPrefix(context.path,group.prefix){
 			context.handles=append(context.handles,group.middles...)
@@ -58,5 +62,9 @@ func (s *Server) createStaticHandler(relativePath string, fs http.FileSystem) Ha
 		fmt.Println(ctx.path)
 		fileserver.ServeHTTP(ctx.W,ctx.Req)
 	}
+}
+func (s *Server) AddHtmlTemplate(path string,name string) {
+	template := template.Must(template.ParseFiles(path))
+	s.Templates[name]=template
 }
 
