@@ -48,7 +48,7 @@ func (s *Server) Group(prefix string)*Group{
 	s.Groups=append(s.Groups,g)
 	return g
 }
-
+//静态文件服务，标准库提供了静态文件服务，实现重定向功能即可
 func (s *Server) RegisterStatic(prefixpath string,filepath string)  {
 	handle:=s.createStaticHandler(prefixpath,http.Dir(filepath))
 	url:=prefixpath+"/*filename"
