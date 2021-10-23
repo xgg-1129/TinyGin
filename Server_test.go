@@ -51,12 +51,7 @@ func TestPanic(t *testing.T) {
 	v1 := r.Group("/v1")
 	v1.RegisterMiddles(PanicRecover())
 	v1.AddGet("/hello", func(ctx *HttpContext) {
-		ctx.SendString(200,fmt.Sprintf("you are at the %sGroup",v1.prefix))
-	})
-	// index out of range for testing Recovery()
-	v1.AddGet("/panic", func(c *HttpContext) {
-		names := []string{"geektutu"}
-		c.SendString(http.StatusOK, names[100])
+		ctx.Redirect(302,"https://www.bing.com/?mkt=zh-CN")
 	})
 	r.Run(":9999")
 }

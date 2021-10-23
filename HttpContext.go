@@ -78,6 +78,11 @@ func (c *HttpContext) SendHtml(code int,templateName string,data interface{})  {
 		}
 	}
 }
+//重定向
+func (c *HttpContext) Redirect(code int,dest string) {
+	c.setHeader("Location",dest)
+	c.sendHeader(code)
+}
 
 func (c *HttpContext) doAllNext(){
 	c.index++
