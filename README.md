@@ -2,3 +2,7 @@
 2.将write和request封装成一个HttpContext
 3.使用前缀树实现动态路由，路由表注册的路由可以是动态的，一条动态路由可以匹配多条路径
 4.分组控制路由，可以直接通过Group添加路由
+5.改变Serve执行函数的逻辑，HttpContext添加一个函数数组，对于每个HttpContext，Server先为它注册中间件函数和执行函数，最后执行doAllNext执行中间件和函数
+6.标准库实现了静态文件服务，只需要实现重定向即可为框架添加静态文件服务
+7.用标准库自带的html/template实现模板渲染
+8.用recover恢复panic错误，然后用trace输出错误信息
